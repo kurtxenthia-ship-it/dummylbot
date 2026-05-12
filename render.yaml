@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: dummylbot-api
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
+    startCommand: node --enable-source-maps artifacts/api-server/dist/index.mjs
+    healthCheckPath: /api/healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: DATABASE_URL
+        value: postgresql://luffywebshop:iUcGwW9XbDdA6YCOUnDg7JULbMTk5PCX@dpg-d7t4s05ckfvc73d1ek20-a/dummylbot
+      - key: SESSION_SECRET
+        value: dummylbot_super_secret_session_key_2026_cozy_secure
+
+  - type: static
+    name: dummylbot
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @workspace/dummyl-bot run build
+    staticPublishPath: artifacts/dummyl-bot/dist/public
+    envVars:
+      - key: BASE_PATH
+        value: /
+      - key: VITE_API_BASE_URL
+        value: https://dummylbot-api.onrender.com
